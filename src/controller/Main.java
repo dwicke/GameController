@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Pattern;
+import java.util.ArrayList;
 
 import javax.swing.*;
 
@@ -53,7 +54,7 @@ public class Main
             + "\n";
     private static final String COMMAND_HELP = "--help";
     private static final String COMMAND_HELP_SHORT = "-h";
-    private static final String DEFAULT_BROADCAST = "255.255.255.255";
+   // private static final ArrayList<String> DEFAULT_BROADCAST = new ArrayList<String>"255.255.255.255";
     private static final String COMMAND_BROADCAST = "--broadcast";
     private static final String COMMAND_BROADCAST_SHORT = "-b";
     private static final String COMMAND_LEAGUE = "--league";
@@ -69,7 +70,15 @@ public class Main
     public static void main(String[] args)
     {
         //commands
-        String outBroadcastAddress = DEFAULT_BROADCAST;
+        ArrayList<String> outBroadcastAddress = new ArrayList<String>();
+        outBroadcastAddress.add("10.112.120.30");
+        outBroadcastAddress.add("10.112.120.31");
+        outBroadcastAddress.add("10.112.120.32");
+        outBroadcastAddress.add("10.112.120.33");
+        outBroadcastAddress.add("10.112.120.34");
+        outBroadcastAddress.add("10.112.120.35");
+        outBroadcastAddress.add("10.112.120.36");
+        outBroadcastAddress.add("10.112.120.37");
         boolean windowMode = false;
         
         parsing:
@@ -78,7 +87,8 @@ public class Main
                     && ((args[i].equalsIgnoreCase(COMMAND_BROADCAST_SHORT))
                     || (args[i].equalsIgnoreCase(COMMAND_BROADCAST)))
                     && IPV4_PATTERN.matcher(args[++i]).matches()) {
-                outBroadcastAddress = args[i];
+                outBroadcastAddress = new ArrayList<String>();
+                outBroadcastAddress.add(args[i]);
                 continue parsing;
             } else if ((args.length > i+1)
                     && ((args[i].equalsIgnoreCase(COMMAND_LEAGUE_SHORT))

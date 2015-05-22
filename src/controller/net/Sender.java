@@ -7,6 +7,7 @@ import data.Rules;
 
 import java.io.IOException;
 import java.net.*;
+import java.util.ArrayList;
 
 /**
  * @author Marcel Steinbeck
@@ -32,7 +33,7 @@ public class Sender extends Thread
     private final DatagramSocket datagramSocket;
 
     /** The used inet-address (the broadcast address). */
-    private final InetAddress group;
+    private final ArrayList<InetAddress> group;
 
     /** The current deep copy of the game-state. */
     private AdvancedData data;
@@ -43,12 +44,14 @@ public class Sender extends Thread
      * @throws SocketException      if an error occurs while creating the socket
      * @throws UnknownHostException if the used inet-address is not valid
      */
-    private Sender(final String broadcastAddress) throws SocketException, UnknownHostException
+    private Sender(ArrayList<String> broadcastAddress) throws SocketException, UnknownHostException
     {
         instance = this;
 
         this.datagramSocket = new DatagramSocket();
-        this.group = InetAddress.getByName(broadcastAddress);
+        this.group = new ArrayList<InetAddress>();
+        for (String address : broadcastAddress)
+            this.group.add(InetAddress.getByName(address));
     }
 
     /**
@@ -58,7 +61,7 @@ public class Sender extends Thread
      * @throws UnknownHostException     if the used inet-address is not valid
      * @throws IllegalStateException    if the sender is already initialized
      */
-    public synchronized static void initialize(final String broadcastAddress) throws SocketException, UnknownHostException
+    public synchronized static void initialize(ArrayList<String> broadcastAddress) throws SocketException, UnknownHostException
     {
         if (null != instance) {
             throw new IllegalStateException("sender is already initialized");
@@ -101,27 +104,32 @@ public class Sender extends Thread
                 data.updateTimes();
                 data.packetNumber = packetNumber;
                 byte[] arr = data.toByteArray().array();
-                DatagramPacket packet = new DatagramPacket(arr, arr.length, group, GameControlData.GAMECONTROLLER_GAMEDATA_PORT);
+                for(InetAddress indiv: group) {
+                    DatagramPacket packet = new DatagramPacket(arr, arr.length, indiv, GameControlData.GAMECONTROLLER_GAMEDATA_PORT);
 
-                try {
-                    datagramSocket.send(packet);
-                    packetNumber++;
-                } catch (IOException e) {
-                    Log.error("Error while sending");
-                    e.printStackTrace();
+                    try {
+                        datagramSocket.send(packet);
+                        packetNumber++;
+                    } catch (IOException e) {
+                        Log.error("Error while sending to " + indiv.getHostAddress());
+                        e.printStackTrace();
+                    }
+
                 }
             }
 
             if (data != null) {
                 if (Rules.league.compatibilityToVersion7) {
                     byte[] arr = data.toByteArray7().array();
-                    DatagramPacket packet = new DatagramPacket(arr, arr.length, group, GameControlData.GAMECONTROLLER_GAMEDATA_PORT);
+                    for(InetAddress indiv: group) {
+                        DatagramPacket packet = new DatagramPacket(arr, arr.length, indiv, GameControlData.GAMECONTROLLER_GAMEDATA_PORT);
 
-                    try {
-                        datagramSocket.send(packet);
-                    } catch (IOException e) {
-                        Log.error("Error while sending");
-                        e.printStackTrace();
+                        try {
+                            datagramSocket.send(packet);
+                        } catch (IOException e) {
+                            Log.error("Error while sending");
+                            e.printStackTrace();
+                        }
                     }
                 }
             }
