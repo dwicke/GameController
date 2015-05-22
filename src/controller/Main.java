@@ -71,14 +71,7 @@ public class Main
     {
         //commands
         ArrayList<String> outBroadcastAddress = new ArrayList<String>();
-        outBroadcastAddress.add("10.112.120.30");
-        outBroadcastAddress.add("10.112.120.31");
-        outBroadcastAddress.add("10.112.120.32");
-        outBroadcastAddress.add("10.112.120.33");
-        outBroadcastAddress.add("10.112.120.34");
-        outBroadcastAddress.add("10.112.120.35");
-        outBroadcastAddress.add("10.112.120.36");
-        outBroadcastAddress.add("10.112.120.37");
+
         boolean windowMode = false;
         
         parsing:
@@ -87,8 +80,7 @@ public class Main
                     && ((args[i].equalsIgnoreCase(COMMAND_BROADCAST_SHORT))
                     || (args[i].equalsIgnoreCase(COMMAND_BROADCAST)))
                     && IPV4_PATTERN.matcher(args[++i]).matches()) {
-                outBroadcastAddress = new ArrayList<String>();
-                outBroadcastAddress.add(args[i]);
+                outBroadcastAddress.add(args[i]);// will keep adding if you keep saying -b
                 continue parsing;
             } else if ((args.length > i+1)
                     && ((args[i].equalsIgnoreCase(COMMAND_LEAGUE_SHORT))
@@ -117,6 +109,17 @@ public class Main
             System.exit(0);
         }
         
+        if(outBroadcastAddress.isEmpty()) { // if none added, just add in the defaults
+            outBroadcastAddress.add("10.112.120.30");
+            outBroadcastAddress.add("10.112.120.31");
+            outBroadcastAddress.add("10.112.120.32");
+            outBroadcastAddress.add("10.112.120.33");
+            outBroadcastAddress.add("10.112.120.34");
+            outBroadcastAddress.add("10.112.120.35");
+            outBroadcastAddress.add("10.112.120.36");
+            outBroadcastAddress.add("10.112.120.37");
+        }
+
         //application-lock
         final ApplicationLock applicationLock = new ApplicationLock("GameController");
         try {
